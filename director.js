@@ -324,8 +324,8 @@ async function run() {
         }
 
         const videoFilter = 'scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1';
-        // Zvýšenie hlasitosti o 50% (volume=1.5)
-        const audioFilter = 'volume=1.5';
+        // Zvýšenie hlasitosti na 350% a normalizácia
+        const audioFilter = 'volume=3.5,loudnorm';
 
         args.push(
             '-vf', videoFilter,
