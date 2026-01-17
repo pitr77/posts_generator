@@ -63,7 +63,6 @@ async function run() {
             const style = document.createElement('style');
             style.innerHTML = `
                 @keyframes subtitle-in { from { opacity: 0; transform: translateX(-50%) translateY(20px) scale(0.9); } to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); } }
-                html, body, * { cursor: none !important; }
                 #director-cursor { transition: all 0.1s ease-out; }
             `;
             document.head.appendChild(style);
@@ -185,36 +184,54 @@ async function run() {
     const startStamp = Date.now();
 
     // 6. Common Helpers
+    const moveToElement = async (text) => {
+        const locator = page.getByText(text, { exact: false }).first();
+        try {
+            await locator.waitFor({ state: 'visible', timeout: 5000 });
+            const box = await locator.boundingBox();
+            if (box) {
+                const targetX = box.x + box.width / 2;
+                const targetY = box.y + box.height / 2;
+                await page.evaluate(({ x, y }) => {
+                    const c = document.getElementById('director-cursor');
+                    c.style.display = 'block';
+                    c.style.left = (x - 25) + 'px';
+                    c.style.top = (y - 25) + 'px';
+                    setTimeout(() => { c.style.transform = 'scale(0.8)'; }, 100);
+                    setTimeout(() => { c.style.transform = 'scale(1)'; }, 200);
+                }, { x: targetX, y: targetY });
+                await page.mouse.move(targetX, targetY, { steps: 8 });
+                return { box, locator };
+            }
+        } catch (e) {
+            console.warn(`⚠️ Nepodarilo sa nájsť element: "${text}"`);
+        }
+        return null;
+    };
+
     const actions = {
         wait: (ms) => page.evaluate((ms) => window.Director.wait(ms), ms),
-        scroll: (y, d) => page.evaluate(({ y, d }) => window.Director.animateScrollTo(y, d), { y, d }),
+        scroll: (x, y, d) => page.evaluate(({ x, y, d }) => window.Director.animateScrollTo(x, y, d), { x, y, d }),
+        move: async (text) => {
+            await moveToElement(text);
+        },
         click: async (text) => {
-            const locator = page.getByText(text, { exact: false }).first();
-            try {
-                await locator.waitFor({ state: 'visible', timeout: 5000 });
-                const box = await locator.boundingBox();
-                if (box) {
-                    await page.evaluate(({ x, y }) => {
-                        const c = document.getElementById('director-cursor');
-                        c.style.display = 'block';
-                        c.style.left = (x - 25) + 'px';
-                        c.style.top = (y - 25) + 'px';
-                        setTimeout(() => { c.style.transform = 'scale(0.8)'; }, 100);
-                        setTimeout(() => { c.style.transform = 'scale(1)'; }, 200);
-                    }, { x: box.x + box.width / 2, y: box.y + box.height / 2 });
-                    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps: 8 });
-                    await locator.click({ delay: 100 });
-                    await page.waitForTimeout(500);
-                    await page.evaluate(() => { document.getElementById('director-cursor').style.display = 'none'; });
-                }
-            } catch (e) {
-                await locator.click({ delay: 100 });
+            const res = await moveToElement(text);
+            if (res) {
+                await res.locator.click({ delay: 100 });
+                await page.waitForTimeout(500);
+                await page.evaluate(() => { document.getElementById('director-cursor').style.display = 'none'; });
+            } else {
+                try { await page.getByText(text, { exact: false }).first().click({ delay: 100 }); } catch (e) { }
             }
         },
         say: async (text, d) => {
             await page.evaluate(({ text, d }) => { window.showSubtitle(text, d); }, { text, d });
         },
         at: async (second) => {
+            if (second === 0) {
+                await page.evaluate(() => { document.body.style.cursor = 'none'; });
+            }
             const offset = config.audioOffset || 0;
             const targetTime = second + offset;
             const elapsed = (Date.now() - startStamp) / 1000;
@@ -238,21 +255,32 @@ async function run() {
                 return candidates[0] || document.scrollingElement || document.documentElement;
             },
             async getTop(s) { return (s === document.documentElement || s === document.body || s === document.scrollingElement) ? window.scrollY : s.scrollTop; },
-            async setTop(s, y) { if (s === document.documentElement || s === document.body || s === document.scrollingElement) window.scrollTo(0, y); else s.scrollTop = y; },
-            async animateScrollTo(targetY, durationMs) {
+            async getLeft(s) { return (s === document.documentElement || s === document.body || s === document.scrollingElement) ? window.scrollX : s.scrollLeft; },
+            async setPos(s, x, y) {
+                if (s === document.documentElement || s === document.body || s === document.scrollingElement) window.scrollTo(x, y);
+                else { s.scrollLeft = x; s.scrollTop = y; }
+            },
+            async animateScrollTo(targetX, targetY, durationMs) {
                 const s = await this.getScroller();
+                const startX = await this.getLeft(s);
                 const startY = await this.getTop(s);
-                const delta = targetY - startY;
+                const deltaX = targetX - startX;
+                const deltaY = targetY - startY;
                 const start = performance.now();
                 return new Promise(resolve => {
                     const frame = () => {
                         const now = performance.now();
                         const t = Math.min(1, (now - start) / durationMs);
-                        this.setTop(s, startY + delta * this.easeInOut(t));
-                        if (t < 1) requestAnimationFrame(frame); else resolve();
+                        const eased = this.easeInOut(t);
+                        this.setPos(s, startX + deltaX * eased, startY + deltaY * eased);
+                        if (t < 1) requestAnimationFrame(frame);
+                        else resolve();
                     };
                     requestAnimationFrame(frame);
                 });
+            },
+            async finalize() {
+                // Ensure everything is finished
             }
         };
     });
@@ -335,4 +363,9 @@ async function run() {
     }
 }
 
-run().catch(console.error);
+run().catch((err) => {
+    console.error(err);
+    process.exit(1);
+}).then(() => {
+    process.exit(0);
+});

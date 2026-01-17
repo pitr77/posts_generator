@@ -27,12 +27,19 @@ module.exports = {
                 await say(step.say, duration);
             }
 
-            // 3. Kliknutia
+            // 3. Kliknutia / Pohyby
             if (step.click) await click(step.click);
+            if (step.move || step.hover) await move(step.move || step.hover);
 
-            // 4. Scrollovanie [targetY, durationMs]
+            // 4. Scrollovanie [targetY, durationMs] ALEBO [targetX, targetY, durationMs]
             if (step.scroll) {
-                await scroll(step.scroll[0], step.scroll[1]);
+                if (step.scroll.length === 3) {
+                    // [X, Y, Duration]
+                    await scroll(step.scroll[0], step.scroll[1], step.scroll[2]);
+                } else {
+                    // [Y, Duration] -> Default X = 0
+                    await scroll(0, step.scroll[0], step.scroll[1]);
+                }
             }
 
             // 5. Čakanie

@@ -1,44 +1,50 @@
 [
     {
         "at": 0,
-        "say": "Quick team form check.",
-        "duration": 2500
-    },
-    {
-        "at": 2.5,
-        "click": "Attacking",
-        "say": "Attacking form right now.",
+        "say": "Worst defences to target right now.",
         "duration": 2000
     },
     {
-        "at": 4.5,
-        "say": "Brentford and Newcastle are leading.",
+        "at": 2,
+        "click": "Defensive",
+        "scroll": [
+            1700,
+            1800
+        ],
+        "say": "Start at the bottom of the defensive table.",
         "duration": 3000
+    },
+    {
+        "at": 5,
+        "say": "These teams concede consistently.",
+        "duration": 2500
     },
     {
         "at": 7.5,
-        "say": "Arsenal close behind.",
-        "duration": 2000
-    },
-    {
-        "at": 9.5,
-        "click": "Defensive",
-        "say": "Now defensive form.",
-        "duration": 2000
-    },
-    {
-        "at": 11.5,
-        "say": "Liverpool are the standout defence.",
+        "scroll": [
+            3300,
+            1600
+        ],
+        "say": "Keep going lower to find the real targets.",
         "duration": 3000
     },
     {
-        "at": 14.5,
-        "say": "Arsenal and Brentford are right there too.",
+        "at": 10.5,
+        "scroll": [
+            6000,
+            2200
+        ],
+        "say": "Down here, clean sheets are rare.",
         "duration": 3000
     },
     {
-        "at": 17.5,
-        "say": "Attack for upside. Defence for safety.",
-        "duration": 2500
+        "at": 13.5,
+        "say": "This is where attackers get upside.",
+        "duration": 3000
+    },
+    {
+        "at": 16.5,
+        "say": "Target the defence, not the badge. FPL Studio.",
+        "duration": 3500
     }
 ]
