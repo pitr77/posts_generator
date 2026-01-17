@@ -101,6 +101,9 @@ async function run() {
     await scenario.run(null, dryRunActions);
 
     let masterAudioPath = null;
+    const recordingsDir = path.join(__dirname, 'recordings');
+    if (!fs.existsSync(recordingsDir)) fs.mkdirSync(recordingsDir);
+
     if (collectedTracks.length > 0) {
         const { generateVoiceTracks } = require('./voice_engine.js');
         const generated = await generateVoiceTracks(collectedTracks, config.lang || 'en');
@@ -108,22 +111,29 @@ async function run() {
         console.log('🎹 Skladám master audio stopu...');
         const ffmpeg = require('ffmpeg-static');
         const { spawnSync } = require('child_process');
-        masterAudioPath = path.join(__dirname, 'recordings', `master_${Date.now()}.mp3`);
+        masterAudioPath = path.join(recordingsDir, `master_${Date.now()}.mp3`);
 
-        const filterStr = generated.map((t, i) => `[${i + 1}:a]adelay=${(t.time * 1000).toFixed(0)}|${(t.time * 1000).toFixed(0)}[a${i}]`).join(';');
-        const mixStr = generated.map((_, i) => `[a${i}]`).join('') + `amix=inputs=${generated.length}:duration=longest[out]`;
+        // Adelay filter requires time in ms for both L and R channels
+        const filterStr = generated.map((t, i) => `[${i + 1}:a]adelay=${Math.round(t.time * 1000)}|${Math.round(t.time * 1000)}[a${i}]`).join(';');
+        // Mix silence [0:a] with all delayed tracks
+        const mixStr = `[0:a]` + generated.map((_, i) => `[a${i}]`).join('') + `amix=inputs=${generated.length + 1}:duration=longest[out]`;
 
         const ffmpegArgs = [
             '-y',
-            '-f', 'lavfi', '-i', 'anullsrc=r=44100:cl=stereo',
-            ...generated.flatMap(t => ['-i', t.filePath]),
+            '-f', 'lavfi', '-i', 'anullsrc=r=44100:cl=stereo', // Base silence [0:a]
+            ...generated.flatMap(t => ['-i', t.filePath]),     // Audio tracks [1..N]
             '-filter_complex', `${filterStr};${mixStr}`,
             '-map', '[out]',
             '-t', '35',
             masterAudioPath
         ];
 
-        spawnSync(ffmpeg, ffmpegArgs, { stdio: 'inherit' });
+        const res = spawnSync(ffmpeg, ffmpegArgs, { stdio: 'pipe' }); // Use pipe to catch errors
+        if (res.status !== 0) {
+            console.error('❌ FFmpeg Audio Error:', res.stderr.toString());
+        } else {
+            console.log('✅ Master audio je pripravené.');
+        }
     }
 
     console.log(`🌐 Navigujem na ${config.url}...`);
@@ -144,12 +154,15 @@ async function run() {
     await page.evaluate(() => { window._timerStart = Date.now(); });
 
     // Play Master Audio Locally
-    if (masterAudioPath) {
+    if (masterAudioPath && fs.existsSync(masterAudioPath)) {
         const { exec } = require('child_process');
-        const fullAudioPath = path.resolve(__dirname, masterAudioPath);
-        const psCmd = `Add-Type -AssemblyName PresentationCore; $m = New-Object System.Windows.Media.MediaPlayer; $m.Open('${fullAudioPath}'); $m.Play(); Start-Sleep -s 300`;
+        // Použijeme dvojité úvodzovky a escapovanie pre PowerShell cesty s medzerami
+        const escapedPath = masterAudioPath.replace(/\\/g, '\\\\');
+        const psCmd = `Add-Type -AssemblyName PresentationCore; $m = New-Object System.Windows.Media.MediaPlayer; $m.Open(\\"${escapedPath}\\"); $m.Play(); Start-Sleep -s 300`;
         exec(`powershell -windowstyle hidden -c "${psCmd}"`);
         console.log('🎵 Nahrávanie spustené (Auto-Voice aktívny)...');
+    } else if (masterAudioPath) {
+        console.warn('⚠️ Master audio súbor nebol nájdený pre živý náhľad.');
     }
 
     const scriptStartTime = (Date.now() - recordingStart) / 1000;
@@ -255,8 +268,11 @@ async function run() {
             '-i', rawVideoPath
         ];
 
-        if (masterAudioPath) {
+        const audioExists = masterAudioPath && fs.existsSync(masterAudioPath);
+        if (audioExists) {
             args.push('-i', masterAudioPath);
+        } else {
+            console.warn('⚠️ Master audio chýba, video bude bez zvuku.');
         }
 
         const videoFilter = 'scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1';
@@ -271,7 +287,7 @@ async function run() {
             '-b:a', '192k'
         );
 
-        if (masterAudioPath) {
+        if (audioExists) {
             args.push('-map', '0:v:0', '-map', '1:a:0');
         } else {
             args.push('-map', '0:v:0');
