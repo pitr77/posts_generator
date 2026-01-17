@@ -261,6 +261,10 @@ async function run() {
     try {
         console.log('🎬 Nahrávam 9:16 vertical video...');
         await scenario.run(page, actions);
+
+        // Poistka: Počkáme, kým uplynie celá vypočítaná dĺžka videa
+        await actions.at(dynamicDuration);
+
         console.log('✅ Scenár úspešne dokončený!');
     } catch (err) {
         console.error('❌ Chyba:', err);

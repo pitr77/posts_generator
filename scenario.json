@@ -1,40 +1,44 @@
 [
     {
         "at": 0,
-        "say": "Quick reality check on team form.",
-        "duration": 3000
+        "say": "Quick team form check.",
+        "duration": 2500
     },
     {
-        "at": 3,
+        "at": 2.5,
         "click": "Attacking",
-        "say": "Strong attacks look great on paper.",
+        "say": "Attacking form right now.",
+        "duration": 2000
+    },
+    {
+        "at": 4.5,
+        "say": "Brentford and Newcastle are leading.",
         "duration": 3000
     },
     {
-        "at": 6,
-        "say": "But team goals don’t always mean FPL points.",
-        "duration": 3000
+        "at": 7.5,
+        "say": "Arsenal close behind.",
+        "duration": 2000
     },
     {
-        "at": 9,
-        "click": "Form",
-        "say": "Colours hide where the points actually go.",
-        "duration": 3000
-    },
-    {
-        "at": 12,
+        "at": 9.5,
         "click": "Defensive",
-        "say": "Defensive form is usually more honest.",
+        "say": "Now defensive form.",
+        "duration": 2000
+    },
+    {
+        "at": 11.5,
+        "say": "Liverpool are the standout defence.",
         "duration": 3000
     },
     {
-        "at": 15,
-        "say": "Low conceded goals mean real clean sheet odds.",
+        "at": 14.5,
+        "say": "Arsenal and Brentford are right there too.",
         "duration": 3000
     },
     {
-        "at": 18,
-        "say": "Use team form for context, not shortcuts.",
-        "duration": 3000
+        "at": 17.5,
+        "say": "Attack for upside. Defence for safety.",
+        "duration": 2500
     }
 ]
