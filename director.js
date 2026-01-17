@@ -31,8 +31,8 @@ async function run() {
     const page = await context.newPage();
     const recordingStart = Date.now();
 
-    const injectSubtitles = async (p) => {
-        await p.evaluate(() => {
+    const injectSubtitles = async (p, totalDuration) => {
+        await p.evaluate((totalDuration) => {
             if (document.getElementById('director-subs')) return;
 
             // Premium Progress Bar
@@ -48,10 +48,10 @@ async function run() {
             document.documentElement.appendChild(timer);
             window._timerStart = Date.now();
             setInterval(() => {
-                const total = 30000;
+                const total = totalDuration * 1000;
                 const elapsed = Date.now() - window._timerStart;
                 const sec = (elapsed / 1000).toFixed(1);
-                timer.innerText = `${sec}s / 30s`;
+                timer.innerText = `${sec}s / ${totalDuration}s`;
                 progress.style.width = Math.min(100, (elapsed / total) * 100) + '%';
             }, 50);
 
@@ -89,16 +89,31 @@ async function run() {
     console.log('🔍 Analyzujem scenár pre Auto-Voice...');
     const collectedTracks = [];
     let currentAt = 0;
+    let maxTime = 0;
     const dryRunActions = {
-        at: (s) => { currentAt = s; },
-        say: (text) => { collectedTracks.push({ text, time: currentAt, id: collectedTracks.length }); },
-        wait: () => { },
+        at: (s) => {
+            currentAt = s;
+            if (s > maxTime) maxTime = s;
+        },
+        say: (text, duration = 4000) => {
+            collectedTracks.push({ text, time: currentAt, id: collectedTracks.length });
+            const end = currentAt + (duration / 1000);
+            if (end > maxTime) maxTime = end;
+        },
+        wait: (ms) => {
+            const end = currentAt + (ms / 1000);
+            if (end > maxTime) maxTime = end;
+        },
         scroll: () => { },
         click: () => { }
     };
 
     const scenario = require('./scenario.js');
     await scenario.run(null, dryRunActions);
+
+    // Dynamic duration with 2s buffer
+    const dynamicDuration = Math.ceil(maxTime + 2);
+    console.log(`⏱️ Zistená dĺžka scenára: ${maxTime.toFixed(1)}s (Exportujem ${dynamicDuration}s)`);
 
     let masterAudioPath = null;
     const recordingsDir = path.resolve(__dirname, 'recordings');
@@ -123,7 +138,7 @@ async function run() {
             ...generated.flatMap(t => ['-i', path.resolve(t.filePath)]),
             '-filter_complex', `${filterStr};${mixStr}`,
             '-map', '[out]',
-            '-t', '35',
+            '-t', (dynamicDuration + 5).toString(),
             masterAudioPath
         ];
 
@@ -139,7 +154,7 @@ async function run() {
     const targetUrl = config.url || 'https://www.fplstudio.com';
     console.log(`🌐 Navigujem na ${targetUrl}...`);
     await page.goto(targetUrl);
-    await injectSubtitles(page);
+    await injectSubtitles(page, dynamicDuration);
 
     // 4. Manual Preparation
     console.log('\n--- 🚦 AUTO-VOICE STUDIO ---');
@@ -265,7 +280,7 @@ async function run() {
         let args = [
             '-y',
             '-ss', scriptStartTime.toFixed(3),
-            '-t', '30',
+            '-t', dynamicDuration.toString(),
             '-i', rawVideoPath
         ];
 
@@ -277,9 +292,12 @@ async function run() {
         }
 
         const videoFilter = 'scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1';
+        // Zvýšenie hlasitosti o 50% (volume=1.5)
+        const audioFilter = 'volume=1.5';
 
         args.push(
             '-vf', videoFilter,
+            '-af', audioFilter,
             '-c:v', 'libx264',
             '-preset', 'slow',
             '-crf', '18',

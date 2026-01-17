@@ -1,57 +1,42 @@
+const fs = require('fs');
+const path = require('path');
+
 module.exports = {
     /**
      * @param {import('playwright').Page} page
      * @param {object} actions - Helper actions
      */
     async run(page, { wait, scroll, click, say, at }) {
-        console.log("🎬 Spúšťam upravený 30s English scenár...");
+        const jsonPath = path.join(__dirname, 'scenario.json');
+        if (!fs.existsSync(jsonPath)) {
+            console.error('❌ scenario.json nebol nájdený!');
+            return;
+        }
 
-        // 0.0 – 4.0: Intro
-        await at(0);
-        await say("FPL update for the next Gameweek", 4000);
-        await scroll(0, 500);
+        const timeline = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+        console.log(`🎬 Spúšťam JSON engine (${timeline.length} krokov)...`);
 
-        // 4.0 – 8.0: Context
-        await at(4);
-        await say("Look beyond big names", 4000);
-        await scroll(250, 2000);
-        await wait(500);
-        await scroll(0, 1500);
+        for (const step of timeline) {
+            // 1. Časovanie
+            if (step.at !== undefined) await at(step.at);
 
-        // 8.0 – 12.0: DEF
-        await at(8);
-        await say("Defence\nCheap starters matter", 4000);
-        await click("DEF");
-        await scroll(650, 1500);
-        await wait(500);
-        await scroll(0, 1500);
+            // 2. Titulky / Hlas
+            if (step.say) {
+                // Vypočítame dĺžku zobrazenia titulku (napr. do ďalšieho kroku alebo fixed 4s)
+                const duration = step.duration || 4000;
+                await say(step.say, duration);
+            }
 
-        // 12.0 – 17.0: MID
-        await at(12);
-        await say("Midfield\nMinutes over hype", 5000);
-        await click("MID");
-        await scroll(650, 2000);
-        await wait(1000);
-        await scroll(0, 1500);
+            // 3. Kliknutia
+            if (step.click) await click(step.click);
 
-        // 17.0 – 22.0: FWD
-        await at(17);
-        await say("Forwards\nWatch penalties", 5000);
-        await click("FWD");
-        await scroll(650, 2000);
-        await wait(1000);
-        await scroll(0, 1500);
+            // 4. Scrollovanie [targetY, durationMs]
+            if (step.scroll) {
+                await scroll(step.scroll[0], step.scroll[1]);
+            }
 
-        // 22.0 – 30.0: Outro
-        await at(22);
-        await say("Data beats opinions\nFPL Studio", 8000);
-        await scroll(0, 1000);
-        await scroll(300, 4000);
-        await wait(500);
-        await scroll(0, 3000);
-
-        // 30.0s exactly
-        await at(30);
-        console.log("🏁 30.0s reached. Final production export triggered.");
+            // 5. Čakanie
+            if (step.wait) await wait(step.wait);
+        }
     }
 };

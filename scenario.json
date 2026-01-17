@@ -1,0 +1,40 @@
+[
+    {
+        "at": 0,
+        "say": "Quick reality check on team form.",
+        "duration": 3000
+    },
+    {
+        "at": 3,
+        "click": "Attacking",
+        "say": "Strong attacks look great on paper.",
+        "duration": 3000
+    },
+    {
+        "at": 6,
+        "say": "But team goals don’t always mean FPL points.",
+        "duration": 3000
+    },
+    {
+        "at": 9,
+        "click": "Form",
+        "say": "Colours hide where the points actually go.",
+        "duration": 3000
+    },
+    {
+        "at": 12,
+        "click": "Defensive",
+        "say": "Defensive form is usually more honest.",
+        "duration": 3000
+    },
+    {
+        "at": 15,
+        "say": "Low conceded goals mean real clean sheet odds.",
+        "duration": 3000
+    },
+    {
+        "at": 18,
+        "say": "Use team form for context, not shortcuts.",
+        "duration": 3000
+    }
+]
