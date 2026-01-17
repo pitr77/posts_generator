@@ -247,23 +247,35 @@ async function run() {
         window.Director = {
             easeInOut: (t) => 0.5 - Math.cos(Math.PI * t) / 2,
             wait: (ms) => new Promise(r => setTimeout(r, ms)),
-            async getScroller() {
+            async getVerticalScroller() {
                 const candidates = Array.from(document.querySelectorAll("body *")).filter(el => {
                     const st = getComputedStyle(el);
                     return (st.overflowY === "auto" || st.overflowY === "scroll") && el.scrollHeight > el.clientHeight + 50;
                 }).sort((a, b) => (b.scrollHeight - b.clientHeight) - (a.scrollHeight - a.clientHeight));
                 return candidates[0] || document.scrollingElement || document.documentElement;
             },
+            async getHorizontalScroller() {
+                const candidates = Array.from(document.querySelectorAll("body *")).filter(el => {
+                    const st = getComputedStyle(el);
+                    return (st.overflowX === "auto" || st.overflowX === "scroll") && el.scrollWidth > el.clientWidth + 50;
+                }).sort((a, b) => (b.scrollWidth - b.clientWidth) - (a.scrollWidth - a.clientWidth));
+                return candidates[0] || document.scrollingElement || document.documentElement;
+            },
             async getTop(s) { return (s === document.documentElement || s === document.body || s === document.scrollingElement) ? window.scrollY : s.scrollTop; },
             async getLeft(s) { return (s === document.documentElement || s === document.body || s === document.scrollingElement) ? window.scrollX : s.scrollLeft; },
-            async setPos(s, x, y) {
-                if (s === document.documentElement || s === document.body || s === document.scrollingElement) window.scrollTo(x, y);
-                else { s.scrollLeft = x; s.scrollTop = y; }
+            async setTop(s, y) {
+                if (s === document.documentElement || s === document.body || s === document.scrollingElement) window.scrollTo(window.scrollX, y);
+                else s.scrollTop = y;
+            },
+            async setLeft(s, x) {
+                if (s === document.documentElement || s === document.body || s === document.scrollingElement) window.scrollTo(x, window.scrollY);
+                else s.scrollLeft = x;
             },
             async animateScrollTo(targetX, targetY, durationMs) {
-                const s = await this.getScroller();
-                const startX = await this.getLeft(s);
-                const startY = await this.getTop(s);
+                const sY = await this.getVerticalScroller();
+                const sX = await this.getHorizontalScroller();
+                const startX = await this.getLeft(sX);
+                const startY = await this.getTop(sY);
                 const deltaX = targetX - startX;
                 const deltaY = targetY - startY;
                 const start = performance.now();
@@ -272,7 +284,8 @@ async function run() {
                         const now = performance.now();
                         const t = Math.min(1, (now - start) / durationMs);
                         const eased = this.easeInOut(t);
-                        this.setPos(s, startX + deltaX * eased, startY + deltaY * eased);
+                        if (deltaY !== 0) this.setTop(sY, startY + deltaY * eased);
+                        if (deltaX !== 0) this.setLeft(sX, startX + deltaX * eased);
                         if (t < 1) requestAnimationFrame(frame);
                         else resolve();
                     };
