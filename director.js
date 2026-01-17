@@ -101,7 +101,7 @@ async function run() {
     await scenario.run(null, dryRunActions);
 
     let masterAudioPath = null;
-    const recordingsDir = path.join(__dirname, 'recordings');
+    const recordingsDir = path.resolve(__dirname, 'recordings');
     if (!fs.existsSync(recordingsDir)) fs.mkdirSync(recordingsDir);
 
     if (collectedTracks.length > 0) {
@@ -111,33 +111,34 @@ async function run() {
         console.log('🎹 Skladám master audio stopu...');
         const ffmpeg = require('ffmpeg-static');
         const { spawnSync } = require('child_process');
-        masterAudioPath = path.join(recordingsDir, `master_${Date.now()}.mp3`);
+        masterAudioPath = path.resolve(recordingsDir, `master_${Date.now()}.mp3`);
 
-        // Adelay filter requires time in ms for both L and R channels
+        // Use absolute paths and forward slashes for FFmpeg consistency
         const filterStr = generated.map((t, i) => `[${i + 1}:a]adelay=${Math.round(t.time * 1000)}|${Math.round(t.time * 1000)}[a${i}]`).join(';');
-        // Mix silence [0:a] with all delayed tracks
         const mixStr = `[0:a]` + generated.map((_, i) => `[a${i}]`).join('') + `amix=inputs=${generated.length + 1}:duration=longest[out]`;
 
         const ffmpegArgs = [
             '-y',
-            '-f', 'lavfi', '-i', 'anullsrc=r=44100:cl=stereo', // Base silence [0:a]
-            ...generated.flatMap(t => ['-i', t.filePath]),     // Audio tracks [1..N]
+            '-f', 'lavfi', '-i', 'anullsrc=r=44100:cl=stereo',
+            ...generated.flatMap(t => ['-i', path.resolve(t.filePath)]),
             '-filter_complex', `${filterStr};${mixStr}`,
             '-map', '[out]',
             '-t', '35',
             masterAudioPath
         ];
 
-        const res = spawnSync(ffmpeg, ffmpegArgs, { stdio: 'pipe' }); // Use pipe to catch errors
-        if (res.status !== 0) {
-            console.error('❌ FFmpeg Audio Error:', res.stderr.toString());
-        } else {
+        const res = spawnSync(ffmpeg, ffmpegArgs, { stdio: 'inherit' });
+        if (res.status === 0 && fs.existsSync(masterAudioPath)) {
             console.log('✅ Master audio je pripravené.');
+        } else {
+            console.error('❌ FFmpeg Audio Assembly zlyhalo.');
+            masterAudioPath = null;
         }
     }
 
-    console.log(`🌐 Navigujem na ${config.url}...`);
-    await page.goto(config.url);
+    const targetUrl = config.url || 'https://www.fplstudio.com';
+    console.log(`🌐 Navigujem na ${targetUrl}...`);
+    await page.goto(targetUrl);
     await injectSubtitles(page);
 
     // 4. Manual Preparation
@@ -156,9 +157,9 @@ async function run() {
     // Play Master Audio Locally
     if (masterAudioPath && fs.existsSync(masterAudioPath)) {
         const { exec } = require('child_process');
-        // Použijeme dvojité úvodzovky a escapovanie pre PowerShell cesty s medzerami
-        const escapedPath = masterAudioPath.replace(/\\/g, '\\\\');
-        const psCmd = `Add-Type -AssemblyName PresentationCore; $m = New-Object System.Windows.Media.MediaPlayer; $m.Open(\\"${escapedPath}\\"); $m.Play(); Start-Sleep -s 300`;
+        // Použijeme dopredné lomky (/), ktoré PowerShell na Windowse bez problémov akceptuje
+        const safePath = masterAudioPath.replace(/\\/g, '/');
+        const psCmd = `Add-Type -AssemblyName PresentationCore; $m = New-Object System.Windows.Media.MediaPlayer; $m.Open('${safePath}'); $m.Play(); Start-Sleep -s 300`;
         exec(`powershell -windowstyle hidden -c "${psCmd}"`);
         console.log('🎵 Nahrávanie spustené (Auto-Voice aktívny)...');
     } else if (masterAudioPath) {

@@ -26,10 +26,15 @@ async function generateVoiceTracks(tracks, lang = 'en') {
         try {
             // Spracovanie textu na audio
             await tts.synthesize(track.text, voice);
-            await tts.toFile(filePath);
+            const buffer = await tts.toBuffer();
+            fs.writeFileSync(filePath, buffer);
 
-            results.push({ ...track, filePath });
-            console.log(`   ✨ Neural: "${track.text.substring(0, 20)}..." -> ${fileName}`);
+            if (fs.existsSync(filePath) && fs.statSync(filePath).size > 0) {
+                results.push({ ...track, filePath });
+                console.log(`   ✨ Neural: "${track.text.substring(0, 20)}..." -> ${fileName}`);
+            } else {
+                console.error(`   ❌ Súbor ${fileName} sa nepodarilo uložiť z buffera.`);
+            }
         } catch (e) {
             console.error(`   ❌ Chyba pri Neural TTS "${track.text}":`, e);
         }
