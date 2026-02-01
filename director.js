@@ -81,6 +81,19 @@ async function run() {
                         };
                         requestAnimationFrame(frame);
                     });
+                },
+                zoom: (scale, x, y, duration) => {
+                    const el = document.body;
+                    el.style.transition = `transform ${duration}ms cubic-bezier(0.45, 0, 0.55, 1), transform-origin ${duration}ms cubic-bezier(0.45, 0, 0.55, 1)`;
+                    if (scale === 1) {
+                        el.style.transform = 'scale(1)';
+                        // Reset origin after transition or keep it? Keeping it is smoother for zoom out
+                        // But finding center is safer.
+                        el.style.transformOrigin = '50% 50%';
+                    } else {
+                        el.style.transformOrigin = `${x}px ${y}px`;
+                        el.style.transform = `scale(${scale})`;
+                    }
                 }
             };
 
@@ -146,7 +159,11 @@ async function run() {
 
             window.Director.showHighlight = (x, y, w, h, duration = 2000) => {
                 const el = document.createElement('div');
-                el.style.cssText = `position:fixed;left:${x}px;top:${y}px;width:${w}px;height:${h}px;border:5px solid #ff0055;border-radius:12px;box-shadow:0 0 25px rgba(255,0,85,0.6);z-index:999997;pointer-events:none;box-sizing:border-box;display:block !important;visible:visible;`;
+                // Use absolute positioning relative to body so it scales with zoom
+                const absX = x + window.scrollX;
+                const absY = y + window.scrollY;
+                el.style.cssText = `position:absolute;left:${absX}px;top:${absY}px;width:${w}px;height:${h}px;border:5px solid #ff0055;border-radius:12px;box-shadow:0 0 25px rgba(255,0,85,0.6);z-index:999997;pointer-events:none;box-sizing:border-box;display:block !important;visible:visible;`;
+
                 // Animation
                 el.animate([
                     { transform: 'scale(1.1)', opacity: 0 },
@@ -157,7 +174,7 @@ async function run() {
                     fill: 'forwards'
                 });
 
-                document.documentElement.appendChild(el);
+                document.body.appendChild(el);
 
                 setTimeout(() => {
                     const anim = el.animate([
@@ -200,7 +217,8 @@ async function run() {
         scroll: () => { },
         click: () => { },
         move: () => { },
-        highlight: () => { }
+        highlight: () => { },
+        zoom: () => { }
     };
 
     const scenario = require('./scenario.js');
@@ -390,6 +408,19 @@ async function run() {
         },
         say: async (text, d) => {
             await page.evaluate(({ text, d }) => { window.showSubtitle(text, d); }, { text, d });
+        },
+        zoom: async (text, scale, duration) => {
+            if (!text || text === "Reset" || scale === 1) {
+                await page.evaluate(({ d }) => window.Director.zoom(1, 0, 0, d), { d: duration || 1000 });
+                return;
+            }
+            const res = await findTarget(text);
+            if (res) {
+                const { box } = res;
+                const centerX = box.x + box.width / 2;
+                const centerY = box.y + box.height / 2;
+                await page.evaluate(({ s, x, y, d }) => window.Director.zoom(s, x, y, d), { s: scale || 1.5, x: centerX, y: centerY, d: duration || 1000 });
+            }
         },
         at: async (second) => {
             if (second === 0) {

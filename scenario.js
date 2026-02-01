@@ -6,7 +6,7 @@ module.exports = {
      * @param {import('playwright').Page} page
      * @param {object} actions - Helper actions
      */
-    async run(page, { wait, scroll, click, move, say, at, highlight }) {
+    async run(page, { wait, scroll, click, move, say, at, highlight, zoom }) {
         const jsonPath = path.join(__dirname, 'scenario.json');
         if (!fs.existsSync(jsonPath)) {
             console.error('❌ scenario.json nebol nájdený!');
@@ -27,10 +27,11 @@ module.exports = {
                 await say(step.say, duration);
             }
 
-            // 3. Kliknutia / Pohyby
+            // 3. Kliknutia / Pohyby / Zoom
             if (step.click) await click(step.click);
             if (step.move || step.hover) await move(step.move || step.hover);
             if (step.highlight) await highlight(step.highlight, step.duration || 2000);
+            if (step.zoom) await zoom(step.zoom, step.scale, step.duration);
 
             // 4. Scrollovanie [targetY, durationMs] ALEBO [targetX, targetY, durationMs]
             if (step.scroll) {
