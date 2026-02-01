@@ -411,9 +411,11 @@ async function run() {
             const res = await findTarget(text);
             if (res) {
                 const { box } = res;
-                const centerX = box.x + box.width / 2;
+                // SMART ZOOM: horizontal anchor at viewport center (390 / 2 = 195) 
+                // to prevent clipping the right side of the video on narrow 9:16 aspect ratio.
+                const viewportCenterX = 195;
                 const centerY = box.y + box.height / 2;
-                await page.evaluate(({ s, x, y, d }) => window.Director.zoom(s, x, y, d), { s: scale || 1.15, x: centerX, y: centerY, d: duration || 1000 });
+                await page.evaluate(({ s, x, y, d }) => window.Director.zoom(s, x, y, d), { s: scale || 1.15, x: viewportCenterX, y: centerY, d: duration || 1000 });
             }
         },
         navigate: async (text) => {
