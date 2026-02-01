@@ -9,7 +9,7 @@
         "say": "Let's dive into the upcoming fixtures. We start with Leeds taking on Nottingham Forest this Friday night.",
         "duration": 5000,
         "zoom": "Leeds",
-        "scale": 1.2
+        "scale": 1.05
     },
     {
         "at": 6.0,
@@ -22,7 +22,7 @@
         "say": "Moving to Saturday, we have a massive clash as Manchester United host Spurs at Old Trafford.",
         "duration": 5000,
         "zoom": "Man Utd",
-        "scale": 1.25
+        "scale": 1.1
     },
     {
         "at": 17.5,
