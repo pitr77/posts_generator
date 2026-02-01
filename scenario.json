@@ -1,93 +1,47 @@
 [
     {
-        "at": 0.5,
-        "navigate": "Team Analysis",
+        "at": 0.0,
+        "navigate": "Fixtures",
         "setup": true
     },
     {
-        "at": 1.5,
-        "say": "Sixty seconds Team Analysis. Let's find the best assets.",
-        "duration": 3500
+        "at": 0.5,
+        "say": "Let's dive into the upcoming fixtures. We start with Leeds taking on Nottingham Forest this Friday night.",
+        "duration": 5000,
+        "zoom": "Leeds",
+        "scale": 1.2
     },
     {
-        "at": 4.5,
-        "zoom": "Rows_1-3",
-        "scale": 1.15,
-        "highlight": "Rows_1-3",
-        "say": "Starting with Attack. These three teams are creating the most xG right now.",
-        "duration": 4500
+        "at": 6.0,
+        "say": "It's an EASY fixture for Forest, while Leeds come in with a Good rating. Keep an eye on the attacking assets here.",
+        "duration": 5500,
+        "highlight": "Row_1"
     },
     {
-        "at": 9.5,
-        "zoom": "Reset",
-        "scale": 1,
-        "duration": 1000
-    },
-    {
-        "at": 11.0,
-        "click": "Defensive",
-        "say": "Switching to Defense.",
-        "duration": 1500
-    },
-    {
-        "at": 13.0,
-        "zoom": "Row_1",
-        "scale": 1.15,
-        "highlight": "Row_1",
-        "say": "This backline is absolutely elite. Essential for clean sheets.",
-        "duration": 4000
+        "at": 12.0,
+        "say": "Moving to Saturday, we have a massive clash as Manchester United host Spurs at Old Trafford.",
+        "duration": 5000,
+        "zoom": "Man Utd",
+        "scale": 1.25
     },
     {
         "at": 17.5,
-        "zoom": "Rows_18-20",
-        "scale": 1.15,
-        "highlight": "Rows_18-20",
-        "say": "Avoid these defenses at all costs. Leaking goals everywhere.",
-        "duration": 4500
+        "say": "The data shows an EASY path for United, but it's a Very Hard test for the Spurs defense.",
+        "duration": 5000,
+        "highlight": "Row_2"
     },
     {
-        "at": 22.5,
-        "zoom": "Reset",
-        "scale": 1,
-        "duration": 1000
+        "at": 23.0,
+        "say": "Finally, Arsenal face Sunderland. The Gunners have an EASY fixture at home, while Sunderland face a mountain to climb.",
+        "duration": 6000,
+        "zoom": "Arsenal",
+        "scale": 1.25,
+        "highlight": "Row_3"
     },
     {
-        "at": 24.0,
-        "click": "Form",
-        "say": "Finally, current form over the last five matches.",
-        "duration": 3000
-    },
-    {
-        "at": 27.5,
-        "zoom": "Rows_1-5",
-        "scale": 1.1,
-        "highlight": "Rows_1-5",
-        "say": "Look at the sea of green here. These teams have momentum.",
-        "duration": 4500
-    },
-    {
-        "at": 32.5,
-        "say": "Target players from these teams for your next transfer.",
-        "duration": 3500
-    },
-    {
-        "at": 36.0,
-        "zoom": "Reset",
-        "scale": 1,
-        "duration": 1000
-    },
-    {
-        "at": 38.0,
-        "say": "Follow for more FPL tips.",
-        "duration": 2000
-    },
-    {
-        "at": 41.0,
-        "scroll": [
-            0,
-            0
-        ],
-        "say": "",
-        "duration": 3000
+        "at": 29.5,
+        "say": "Follow us for more deep dives into the FPL data and good luck with your transfers!",
+        "duration": 5000,
+        "zoom": "Reset"
     }
 ]
