@@ -6,7 +6,7 @@ module.exports = {
      * @param {import('playwright').Page} page
      * @param {object} actions - Helper actions
      */
-    async run(page, { wait, scroll, click, move, say, at, highlight, zoom }) {
+    async run(page, { wait, scroll, click, move, say, at, highlight, zoom, navigate }, phase = 'all') {
         const jsonPath = path.join(__dirname, 'scenario.json');
         if (!fs.existsSync(jsonPath)) {
             console.error('❌ scenario.json nebol nájdený!');
@@ -14,9 +14,16 @@ module.exports = {
         }
 
         const timeline = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
-        console.log(`🎬 Spúšťam JSON engine (${timeline.length} krokov)...`);
+        const stepsToRun = timeline.filter(step => {
+            if (phase === 'all') return true;
+            if (phase === 'setup') return step.setup === true;
+            if (phase === 'main') return !step.setup;
+            return true;
+        });
 
-        for (const step of timeline) {
+        console.log(`🎬 Spúšťam JSON engine (${phase} phase, ${stepsToRun.length} krokov)...`);
+
+        for (const step of stepsToRun) {
             // 1. Časovanie
             if (step.at !== undefined) await at(step.at);
 
@@ -27,7 +34,8 @@ module.exports = {
                 await say(step.say, duration);
             }
 
-            // 3. Kliknutia / Pohyby / Zoom
+            // 3. Kliknutia / Pohyby / Zoom / Navigácia
+            if (step.navigate) await navigate(step.navigate);
             if (step.click) await click(step.click);
             if (step.move || step.hover) await move(step.move || step.hover);
             if (step.highlight) await highlight(step.highlight, step.duration || 2000);

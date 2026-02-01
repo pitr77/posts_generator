@@ -1,89 +1,93 @@
 [
     {
-        "at": 0,
-        "say": "Quick Monday snapshot: team form over the last five matches.",
-        "duration": 3200
+        "at": 0.5,
+        "navigate": "Team Analysis",
+        "setup": true
     },
     {
-        "at": 3.9,
-        "click": "Defensive",
-        "duration": 1100
+        "at": 1.5,
+        "say": "Sixty seconds Team Analysis. Let's find the best assets.",
+        "duration": 3500
     },
     {
-        "at": 5.4,
-        "highlight": "Row_1",
-        "say": "Number one defence right now. If you want a clean sheet base, start here.",
-        "duration": 4200
-    },
-    {
-        "at": 5.4,
-        "zoom": "Rows_2-3",
+        "at": 4.5,
+        "zoom": "Rows_1-3",
         "scale": 1.15,
-        "duration": 3000
+        "highlight": "Rows_1-3",
+        "say": "Starting with Attack. These three teams are creating the most xG right now.",
+        "duration": 4500
     },
     {
-        "at": 10.5,
+        "at": 9.5,
         "zoom": "Reset",
         "scale": 1,
+        "duration": 1000
+    },
+    {
+        "at": 11.0,
+        "click": "Defensive",
+        "say": "Switching to Defense.",
         "duration": 1500
     },
     {
-        "at": 15.6,
-        "say": "Now let’s switch to attacking form.",
+        "at": 13.0,
+        "zoom": "Row_1",
+        "scale": 1.15,
+        "highlight": "Row_1",
+        "say": "This backline is absolutely elite. Essential for clean sheets.",
+        "duration": 4000
+    },
+    {
+        "at": 17.5,
+        "zoom": "Rows_18-20",
+        "scale": 1.15,
+        "highlight": "Rows_18-20",
+        "say": "Avoid these defenses at all costs. Leaking goals everywhere.",
+        "duration": 4500
+    },
+    {
+        "at": 22.5,
+        "zoom": "Reset",
+        "scale": 1,
+        "duration": 1000
+    },
+    {
+        "at": 24.0,
+        "click": "Form",
+        "say": "Finally, current form over the last five matches.",
         "duration": 3000
     },
     {
-        "at": 19.0,
-        "click": "Attacking",
-        "duration": 1100
+        "at": 27.5,
+        "zoom": "Rows_1-5",
+        "scale": 1.1,
+        "highlight": "Rows_1-5",
+        "say": "Look at the sea of green here. These teams have momentum.",
+        "duration": 4500
     },
     {
-        "at": 20.6,
-        "highlight": "Row_1",
-        "say": "Top attack for goals per game in this window.",
-        "duration": 3600
+        "at": 32.5,
+        "say": "Target players from these teams for your next transfer.",
+        "duration": 3500
     },
     {
-        "at": 24.8,
-        "highlight": "Row_3",
-        "say": "And this one is the sleeper — still scoring, usually lower owned.",
-        "duration": 4200
+        "at": 36.0,
+        "zoom": "Reset",
+        "scale": 1,
+        "duration": 1000
     },
     {
-        "at": 29.8,
-        "say": "One last thing: the results behind the numbers.",
-        "duration": 3200
+        "at": 38.0,
+        "say": "Follow for more FPL tips.",
+        "duration": 2000
     },
     {
-        "at": 33.4,
-        "click": "Form",
-        "duration": 1100
-    },
-    {
-        "at": 35.0,
-        "scroll": [
-            0,
-            900
-        ],
-        "say": "I’m scanning momentum — green builds confidence, red is the warning sign.",
-        "duration": 4200
-    },
-    {
-        "at": 40.0,
-        "say": "Resetting the view for a clean screenshot.",
-        "duration": 2600
-    },
-    {
-        "at": 43.1,
+        "at": 41.0,
         "scroll": [
             0,
             0
         ],
-        "duration": 5200
-    },
-    {
-        "at": 49.0,
-        "say": "That’s it. Next up: matching these teams to player picks in FPL Studio.",
-        "duration": 5200
+        "say": "",
+        "duration": 3000
     }
 ]

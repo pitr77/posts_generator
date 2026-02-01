@@ -217,12 +217,14 @@ async function run() {
         scroll: () => { },
         click: () => { },
         move: () => { },
+        move: () => { },
         highlight: () => { },
-        zoom: () => { }
+        zoom: () => { },
+        navigate: () => { }
     };
 
     const scenario = require('./scenario.js');
-    await scenario.run(null, dryRunActions);
+    await scenario.run(null, dryRunActions, 'main');
 
     // Dynamic duration with 2s buffer
     const dynamicDuration = Math.ceil(maxTime + 2);
@@ -273,33 +275,9 @@ async function run() {
     console.log(`🌐 Navigujem na ${targetUrl}...`);
     await page.goto(targetUrl);
 
-    // 4. Manual Preparation
-    console.log('\n--- 🚦 AUTO-VOICE STUDIO ---');
-    console.log('1. V prehliadači si nastav scénu.');
-    console.log('2. Daj ENTER pre "One-Click" produkciu.');
-    console.log('----------------------------\n');
+    // 4. Manual Preparation MOVED DOWN
 
-    process.stdin.resume();
-    await new Promise(resolve => process.stdin.once('data', resolve));
-    process.stdin.pause();
-
-    // Reset timer on Enter
-    await page.evaluate(() => { window._timerStart = Date.now(); });
-
-    // Play Master Audio Locally
-    if (masterAudioPath && fs.existsSync(masterAudioPath)) {
-        const { exec } = require('child_process');
-        // Použijeme dopredné lomky (/), ktoré PowerShell na Windowse bez problémov akceptuje
-        const safePath = masterAudioPath.replace(/\\/g, '/');
-        const psCmd = `Add-Type -AssemblyName PresentationCore; $m = New-Object System.Windows.Media.MediaPlayer; $m.Open('${safePath}'); $m.Play(); Start-Sleep -s 300`;
-        exec(`powershell -windowstyle hidden -c "${psCmd}"`);
-        console.log('🎵 Nahrávanie spustené (Auto-Voice aktívny)...');
-    } else if (masterAudioPath) {
-        console.warn('⚠️ Master audio súbor nebol nájdený pre živý náhľad.');
-    }
-
-    const scriptStartTime = (Date.now() - recordingStart) / 1000;
-    const startStamp = Date.now();
+    // Audio playback logic moved to Step 7
 
     // 6. Common Helpers
     const findTarget = async (text) => {
@@ -332,7 +310,7 @@ async function run() {
         const aliases = {
             "Improving_Button": "Improving",
             "Worsening_Button": "Worsening",
-            "Menu": "css:button i.fa-bars, .fa-bars, button[aria-label='Menu'], button:has(i.fa-bars)",
+            "Menu": "css:button:has(.lucide-menu), .lucide-menu, button i.fa-bars, .fa-bars, [aria-label='Toggle navigation'], .navbar-toggler, button:has(svg path[d*='M4 6h16']), button:has(svg), [data-testid='menu-button'], nav button",
             "Defensive": "css:button:has-text('Defensive'), [role='button']:has-text('Defensive'), [role='tab']:has-text('Defensive'), a:has-text('Defensive')",
             "Form": "css:button:has-text('Form'), [role='button']:has-text('Form'), [role='tab']:has-text('Form'), a:has-text('Form')",
             "Row_1": "css:tr:has-text('#1'), [role='row']:has-text('#1')",
@@ -343,15 +321,31 @@ async function run() {
 
         let locator;
         if (typeof target === 'string' && target.startsWith('css:')) {
-            locator = page.locator(target.replace('css:', '')).first();
+            locator = page.locator(target.replace('css:', ''));
         } else {
-            locator = page.getByText(target, { exact: false }).first();
+            locator = page.getByText(target, { exact: false });
         }
 
         try {
-            await locator.waitFor({ state: 'visible', timeout: 3000 });
-            const box = await locator.boundingBox();
-            return box ? { box, locator } : null;
+            // Iterate to find the first VISIBLE one
+            const count = await locator.count();
+            for (let i = 0; i < count; ++i) {
+                const candidate = locator.nth(i);
+                if (await candidate.isVisible()) {
+                    const box = await candidate.boundingBox();
+                    if (box) return { box, locator: candidate };
+                }
+            }
+
+            // Fallback: if none are strictly visible right now, maybe wait for the first one?
+            // But if we are here, it means we didn't find any visible one.
+            // Let's rely on standard wait for the first one as a backup, 
+            // incase it's a timing issue and it will BECOME visible.
+            const first = locator.first();
+            await first.waitFor({ state: 'visible', timeout: 3000 });
+            const box = await first.boundingBox();
+            return box ? { box, locator: first } : null;
+
         } catch (e) {
             return null;
         }
@@ -419,7 +413,77 @@ async function run() {
                 const { box } = res;
                 const centerX = box.x + box.width / 2;
                 const centerY = box.y + box.height / 2;
-                await page.evaluate(({ s, x, y, d }) => window.Director.zoom(s, x, y, d), { s: scale || 1.5, x: centerX, y: centerY, d: duration || 1000 });
+                await page.evaluate(({ s, x, y, d }) => window.Director.zoom(s, x, y, d), { s: scale || 1.15, x: centerX, y: centerY, d: duration || 1000 });
+            }
+        },
+        navigate: async (text) => {
+            console.log(`🧭 Navigating to: "${text}"`);
+
+            const findVisibleLink = async () => {
+                const locator = page.getByText(text, { exact: false });
+                const count = await locator.count();
+                // console.log(`   found ${count} potential links for "${text}"`);
+                for (let i = 0; i < count; ++i) {
+                    const l = locator.nth(i);
+                    if (await l.isVisible()) return l;
+                }
+                return null;
+            };
+
+            const performClick = async (link) => {
+                try {
+                    await link.click({ force: true, timeout: 2000 });
+                    return true;
+                } catch (e) {
+                    console.log(`   ⚠️ Click failed: ${e.message}`);
+                    return false;
+                }
+            };
+
+            let link = await findVisibleLink();
+
+            // 1. Try to click if found immediately
+            if (link) {
+                console.log("   found candidate link, trying to click...");
+                if (await performClick(link)) {
+                    await page.waitForTimeout(1000);
+                    return;
+                }
+                console.log("   ❌ Direct click failed, assuming menu needs opening...");
+            } else {
+                console.log(`   Link not visible, attempting to open menu...`);
+            }
+
+            // 2. Open Menu
+            let menuRes = await findTarget("Menu");
+            if (!menuRes) {
+                console.log("   ⚠️ Standard Menu alias failed, trying direct .lucide-menu selector...");
+                const fallback = page.locator('.lucide-menu, button:has(.lucide-menu)').first();
+                if (await fallback.count() > 0) menuRes = { locator: fallback };
+            }
+
+            if (menuRes) {
+                console.log("   ✅ Menu button found, clicking...");
+                await menuRes.locator.click({ force: true });
+                await page.waitForTimeout(1500);
+                link = await findVisibleLink();
+            } else {
+                console.error("   ❌ CRITICAL: Could not find Menu button!");
+            }
+
+            // 3. Click again
+            if (link) {
+                console.log("   ✅ Target link found (in menu), clicking...");
+                if (!await performClick(link)) {
+                    console.error("   ❌ Click failed again. Forcing click on first match...");
+                    try {
+                        await page.getByText(text, { exact: false }).first().click({ force: true, timeout: 2000 });
+                    } catch (e) { console.error("   ❌ Forced click failed."); }
+                } else {
+                    await page.waitForTimeout(1000);
+                }
+            } else {
+                console.error("   ❌ FAILED: Link still not visible even after menu open");
             }
         },
         at: async (second) => {
@@ -436,10 +500,53 @@ async function run() {
         }
     };
 
-    // 7. Start Scenario
+    let startStamp = Date.now();
+    let scriptStartTime = 0;
+
+    // 6. Setup Phase & User Prompt
+    try {
+        console.log('🏗️ Spúšťam SETUP fázu (navigácia)...');
+        startStamp = Date.now(); // Initialize for setup timing
+        await scenario.run(page, actions, 'setup');
+    } catch (e) {
+        console.error("Setup failed (continuing to prompt):", e);
+    }
+
+    try {
+        console.log('\n--- 🚦 AUTO-VOICE STUDIO ---');
+        console.log('1. V prehliadači skontroluj SETUP (zvolená sekcia).');
+        console.log('2. Daj ENTER pre "One-Click" produkciu (Nahrávanie).');
+        console.log('----------------------------\n');
+
+        process.stdin.resume();
+        // Drain any previous formatting enter keys
+        process.stdin.removeAllListeners('data');
+        await new Promise(resolve => process.stdin.once('data', resolve));
+        process.stdin.pause();
+
+        // Start Recording Markers
+        scriptStartTime = (Date.now() - recordingStart) / 1000;
+        startStamp = Date.now();
+
+        // Reset timer on Enter
+        await page.evaluate(() => { window._timerStart = Date.now(); });
+    } catch (e) {
+        console.error("Prompt error:", e);
+    }
+
+    // Play Master Audio Locally
+    if (masterAudioPath && fs.existsSync(masterAudioPath)) {
+        const { exec } = require('child_process');
+        const safePath = masterAudioPath.replace(/\\/g, '/');
+        const psCmd = `Add-Type -AssemblyName PresentationCore; $m = New-Object System.Windows.Media.MediaPlayer; $m.Open('${safePath}'); $m.Play(); Start-Sleep -s 300`;
+        exec(`powershell -windowstyle hidden -c "${psCmd}"`);
+        console.log('🎵 Nahrávanie spustené (Auto-Voice aktívny)...');
+    }
+
+    // 7. Start Scenario (Main Recording)
     try {
         console.log('🎬 Nahrávam 9:16 vertical video...');
-        await scenario.run(page, actions);
+        await scenario.run(page, actions, 'main');
 
         // Poistka: Počkáme, kým uplynie celá vypočítaná dĺžka videa
         await actions.at(dynamicDuration);
