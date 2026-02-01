@@ -15,16 +15,15 @@ async function generateVoiceTracks(tracks, lang = 'en') {
 
     console.log(`🎙️ Generujem Microsoft Neural TTS (Hlas: ${voice})...`);
 
-    // Inicializácia Edge TTS
-    const tts = new EdgeTTS();
-
     const results = [];
     for (const track of tracks) {
         const fileName = `track_${track.id}.mp3`;
         const filePath = path.join(outputDir, fileName);
 
+        // Inicializácia pre každú vetu zvlášť - toto opravuje to "násobenie" hlasov
+        const tts = new EdgeTTS();
+
         try {
-            // Spracovanie textu na audio
             await tts.synthesize(track.text, voice);
             const buffer = await tts.toBuffer();
             fs.writeFileSync(filePath, buffer);

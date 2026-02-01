@@ -1,50 +1,83 @@
 [
     {
         "at": 0,
-        "say": "Worst defences to target right now.",
-        "duration": 2000
+        "say": "Quick Monday snapshot: team form over the last five matches.",
+        "duration": 3200
     },
     {
-        "at": 2,
+        "at": 3.9,
         "click": "Defensive",
+        "duration": 1100
+    },
+    {
+        "at": 5.4,
+        "highlight": "Row_1",
+        "say": "Number one defence right now. If you want a clean sheet base, start here.",
+        "duration": 4200
+    },
+    {
+        "at": 10.4,
+        "highlight": "Rows_2-3",
+        "say": "These two are the next safest tier — great if you can’t reach the top option.",
+        "duration": 4200
+    },
+    {
+        "at": 15.6,
+        "say": "Now let’s switch to attacking form.",
+        "duration": 3000
+    },
+    {
+        "at": 19.0,
+        "click": "Attacking",
+        "duration": 1100
+    },
+    {
+        "at": 20.6,
+        "highlight": "Row_1",
+        "say": "Top attack for goals per game in this window.",
+        "duration": 3600
+    },
+    {
+        "at": 24.8,
+        "highlight": "Row_3",
+        "say": "And this one is the sleeper — still scoring, usually lower owned.",
+        "duration": 4200
+    },
+    {
+        "at": 29.8,
+        "say": "One last thing: the results behind the numbers.",
+        "duration": 3200
+    },
+    {
+        "at": 33.4,
+        "click": "Form",
+        "duration": 1100
+    },
+    {
+        "at": 35.0,
         "scroll": [
-            1700,
-            1800
+            0,
+            900
         ],
-        "say": "Start at the bottom of the defensive table.",
-        "duration": 3000
+        "say": "I’m scanning momentum — green builds confidence, red is the warning sign.",
+        "duration": 4200
     },
     {
-        "at": 5,
-        "say": "These teams concede consistently.",
-        "duration": 2500
+        "at": 40.0,
+        "say": "Resetting the view for a clean screenshot.",
+        "duration": 2600
     },
     {
-        "at": 7.5,
+        "at": 43.1,
         "scroll": [
-            3300,
-            1600
+            0,
+            0
         ],
-        "say": "Keep going lower to find the real targets.",
-        "duration": 3000
+        "duration": 5200
     },
     {
-        "at": 10.5,
-        "scroll": [
-            6000,
-            2200
-        ],
-        "say": "Down here, clean sheets are rare.",
-        "duration": 3000
-    },
-    {
-        "at": 13.5,
-        "say": "This is where attackers get upside.",
-        "duration": 3000
-    },
-    {
-        "at": 16.5,
-        "say": "Target the defence, not the badge. FPL Studio.",
-        "duration": 3500
+        "at": 49.0,
+        "say": "That’s it. Next up: matching these teams to player picks in FPL Studio.",
+        "duration": 5200
     }
 ]

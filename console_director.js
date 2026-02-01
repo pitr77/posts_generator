@@ -150,7 +150,12 @@
     }
 
     function clickByText(text) {
-        const wanted = text.trim().toUpperCase();
+        const aliases = {
+            "Improving_Button": "Improving",
+            "Worsening_Button": "Worsening"
+        };
+        const target = aliases[text] || text;
+        const wanted = target.trim().toUpperCase();
         const pool = [
             ...document.querySelectorAll("button"),
             ...document.querySelectorAll("[role='button']"),
