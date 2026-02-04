@@ -1,47 +1,127 @@
 [
     {
-        "at": 0.0,
-        "navigate": "Fixtures",
-        "setup": true
+        "at": 0,
+        "setup": true,
+        "navigate": "Transfer Picks"
     },
     {
-        "at": 0.5,
-        "say": "Let's dive into the upcoming fixtures. We start with Leeds taking on Nottingham Forest this Friday night.",
-        "duration": 5000,
-        "zoom": "Leeds",
-        "scale": 1.05
+        "at": 1.0,
+        "say": "Hey there! We have some top transfer tips for the upcoming gameweek.",
+        "duration": 4000
     },
     {
-        "at": 6.0,
-        "say": "It's an EASY fixture for Forest, while Leeds come in with a Good rating. Keep an eye on the attacking assets here.",
-        "duration": 5500,
-        "highlight": "Row_1"
+        "at": 5.2,
+        "say": "Today, we're focusing on defenders and forwards.",
+        "duration": 3500
     },
     {
-        "at": 12.0,
-        "say": "Moving to Saturday, we have a massive clash as Manchester United host Spurs at Old Trafford.",
-        "duration": 5000,
-        "zoom": "Man Utd",
-        "scale": 1.1
-    },
-    {
-        "at": 17.5,
-        "say": "The data shows an EASY path for United, but it's a Very Hard test for the Spurs defense.",
-        "duration": 5000,
-        "highlight": "Row_2"
-    },
-    {
-        "at": 23.0,
-        "say": "Finally, Arsenal face Sunderland. The Gunners have an EASY fixture at home, while Sunderland face a mountain to climb.",
+        "at": 10.0,
+        "say": "Let's start with the defense. Switching over to the defensive section now.",
         "duration": 6000,
-        "zoom": "Arsenal",
-        "scale": 1.25,
-        "highlight": "Row_3"
+        "click": "DEF"
     },
     {
-        "at": 29.5,
-        "say": "Follow us for more deep dives into the FPL data and good luck with your transfers!",
-        "duration": 5000,
-        "zoom": "Reset"
+        "at": 19.0,
+        "highlight": "Gabriel",
+        "duration": 7500
+    },
+    {
+        "at": 19.5,
+        "say": "Arsenal's Gabriel is the clear number one among defenders,",
+        "duration": 4000
+    },
+    {
+        "at": 23.5,
+        "say": "thanks to his high form and the Gunners' solid backline.",
+        "duration": 4500
+    },
+    {
+        "at": 31.0,
+        "highlight": "Timber",
+        "duration": 8000
+    },
+    {
+        "at": 31.5,
+        "say": "His teammate Jurrien Timber is a great alternative,",
+        "duration": 4000
+    },
+    {
+        "at": 35.5,
+        "say": "offering serious attacking threat at an excellent price point.",
+        "duration": 4500
+    },
+    {
+        "at": 42.0,
+        "say": "Now let's switch gears and look at the strikers.",
+        "duration": 4000,
+        "scroll": [
+            0,
+            1000
+        ]
+    },
+    {
+        "at": 46.2,
+        "say": "Heading over to the forwards section.",
+        "duration": 3000,
+        "click": "FWD"
+    },
+    {
+        "at": 51.5,
+        "scroll": [
+            250,
+            1000
+        ]
+    },
+    {
+        "at": 53.0,
+        "highlight": "João Pedro",
+        "duration": 8000
+    },
+    {
+        "at": 53.5,
+        "say": "Brighton's João Pedro is currently the most sought-after forward.",
+        "duration": 4000
+    },
+    {
+        "at": 57.5,
+        "say": "His value for money is simply unbeatable right now.",
+        "duration": 4500
+    },
+    {
+        "at": 64.5,
+        "scroll": [
+            480,
+            1000
+        ]
+    },
+    {
+        "at": 66.0,
+        "highlight": "Ekitiké",
+        "duration": 8000
+    },
+    {
+        "at": 66.5,
+        "say": "Our dark horse pick is Ekitiké. His expected goals data is very promising,",
+        "duration": 4500
+    },
+    {
+        "at": 71.0,
+        "say": "suggesting more points are coming soon.",
+        "duration": 4000
+    },
+    {
+        "at": 77.0,
+        "say": "We hope these picks help you dominate your mini-leagues.",
+        "duration": 4000
+    },
+    {
+        "at": 81.2,
+        "say": "Good luck and see you in the next one!",
+        "duration": 3500
+    },
+    {
+        "at": 86.0,
+        "say": "Happy point hunting and good luck!",
+        "duration": 4000
     }
 ]

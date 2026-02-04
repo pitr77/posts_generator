@@ -1,5 +1,9 @@
 # 🎬 Director Studio - Scenario Guide
 
+
+Data pre scenario ziskaj z fplstudio.com
+Podporované jazyky: Angličtina (en), Slovenčina (sk). Nastav v `config.json`.
+
 Tento súbor popisuje, ako písať scenáre pre **Director Studio** (`director.js`). Scenár je definovaný v súbore `scenario.json` ako pole objektov (krokov).
 
 ## ⚡ Rýchly Prehľad
@@ -23,6 +27,8 @@ Každý krok môže obsahovať kombináciu akcií. Kľúčová je vlastnosť `at
 ```
 
 ---
+
+Na konci, alebo pred koncom vyscrolluj hore
 
 ## 🛠️ Dostupné Akcie
 
@@ -67,7 +73,7 @@ Automaticky nájde sekciu v menu a preklikne sa tam. Ak je menu zatvorené (napr
 
 ### 6. 🖱️ Interakcia (`click`, `scroll`)
 - `click`: Text alebo selektor elementu, na ktorý sa má kliknúť (napr. `"Defensive"`).
-- `scroll`: Pole súradníc `[x, y]` (napr. `[0, 500]`) pre posun stránky.
+- `scroll`: Pole hodnôt `[targetY, durationMs]` (napr. `[500, 1000]`) alebo `[targetX, targetY, durationMs]`.
 
 ---
 
@@ -86,10 +92,9 @@ Script podporuje niekoľko spôsobov, ako nájsť element:
 
 ## 💡 Tipy pre "Viral" Kvalitu
 
-1.  **Zoom + Highlight:** Kombinuj ich pre maximálny efekt.
-    ```json
-    { "at": 10, "zoom": "Rows_1-3", "scale": 1.15, "highlight": "Rows_1-3", "duration": 3000 }
-    ```
-2.  **Resetuj Zoom:** Nezabudni vrátiť kameru späť (`"zoom": "Reset"`), inak divák stratí kontext.
-3.  **Jemný Zoom:** Pre tabuľky stačí `scale: 1.1` až `1.2`. Väčší zoom (1.5+) je dobrý len na detaily jedného riadku.
+
+
 4.  **Plynulosť:** Uisti sa, že `duration` pre titulky (`say`) je dostatočne dlhé, aby sa text stihol prečítať.
+5.  **Timing & Medzery:** Medzi vetami (akciami `say`) nechávaj aspoň **2-sekundové medzery**. Divák potrebuje čas na spracovanie vizuálnej informácie.
+6.  **Informačná Hustota:** Menej je viac. Ak je informácií príliš veľa v krátkom čase, video pôsobí chaoticky. Radšej zvoľ polovičné množstvo textu v rovnakom čase.
+7.  **Skratky Tímov:** V tabuľkách (Matrix) používaj radšej skratky ako sú v UI (`ARS`, `BHA`, `SUN`) pre presnejšie zameranie `highlight` a `zoom`.

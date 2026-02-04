@@ -1,0 +1,89 @@
+[
+    {
+        "at": 0,
+        "setup": true,
+        "navigate": "Detailed Analyses"
+    },
+    {
+        "at": 0.5,
+        "say": "Welcome to FPL Studio analysis. Today, we're looking at the most consistent players over the last five gameweeks.",
+        "duration": 5000
+    },
+    {
+        "at": 7.5,
+        "zoom": "Row_1",
+        "scale": 1.15,
+        "highlight": "Row_1",
+        "duration": 4000
+    },
+    {
+        "at": 7.5,
+        "say": "Arsenal's Gabriel is a top pick with an average form of 8.0 and a massive performance back in Gameweek 19.",
+        "duration": 5000
+    },
+    {
+        "at": 14.5,
+        "say": "If you're hunting for defenders, let's switch the filter and check other names.",
+        "duration": 4000,
+        "click": "DEF"
+    },
+    {
+        "at": 20.5,
+        "zoom": "Row_3",
+        "scale": 1.15,
+        "highlight": "Row_3",
+        "duration": 4000
+    },
+    {
+        "at": 20.5,
+        "say": "Romero from Tottenham maintains an 80 percent consistency rate, making him a reliable bedrock for your team.",
+        "duration": 5000
+    },
+    {
+        "at": 27.5,
+        "zoom": "Row_4",
+        "scale": 1.15,
+        "highlight": "Row_4",
+        "duration": 4000
+    },
+    {
+        "at": 27.5,
+        "say": "A real surprise is Mukiele with 100 percent stability, even with a lower points median.",
+        "duration": 5000
+    },
+    {
+        "at": 34.5,
+        "say": "Let's head back to all players and check out the midfield.",
+        "duration": 4000,
+        "click": "All"
+    },
+    {
+        "at": 40.5,
+        "zoom": "Enzo",
+        "scale": 1.15,
+        "highlight": "Enzo",
+        "duration": 4000
+    },
+    {
+        "at": 40.5,
+        "say": "Both Enzo and Bruno Guimarães are delivering steady returns and remain key for your upcoming transfers.",
+        "duration": 5000
+    },
+    {
+        "at": 47.5,
+        "say": "Don't forget to watch the consistency column – it tells you who won't let you down when it matters most.",
+        "duration": 5000,
+        "highlight": "CONS"
+    },
+    {
+        "at": 54.5,
+        "say": "Click the link in BIO and dominate your mini-league! Good luck in the next gameweek!",
+        "duration": 4500,
+        "zoom": "Reset"
+    },
+    {
+        "at": 60,
+        "say": "Happy hunting!",
+        "duration": 1000
+    }
+]

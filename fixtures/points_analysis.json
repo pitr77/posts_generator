@@ -1,0 +1,88 @@
+[
+    {
+        "at": 0,
+        "setup": true,
+        "navigate": "Points Analysis"
+    },
+    {
+        "at": 0,
+        "say": "Vitajte u analýzy FPL Studio. Dnes sa pozrieme na najkonzistentnejších hráčov posledných piatich kôl.",
+        "duration": 4000
+    },
+    {
+        "at": 5,
+        "zoom": "Gabriel",
+        "scale": 1.4,
+        "duration": 2000
+    },
+    {
+        "at": 5,
+        "say": "Gabriel z Arsenalu je s formou okolo 8 bodov a skvelým výkonom v GW19 top voľbou.",
+        "duration": 5000,
+        "highlight": "Gabriel"
+    },
+    {
+        "at": 11,
+        "say": "Ak hľadáte obrancov, prepneme filter a pozrieme sa na ďalšie mená.",
+        "duration": 4000,
+        "click": "DEF"
+    },
+    {
+        "at": 16,
+        "zoom": "DEF Table",
+        "scale": 1.2,
+        "duration": 1500
+    },
+    {
+        "at": 18,
+        "say": "Romero z Tottenhamu drží 80-percentnú konzistenciu, čo z neho robí spoľahlivý pilier tímu.",
+        "duration": 5000,
+        "highlight": "Romero"
+    },
+    {
+        "at": 24,
+        "say": "Prekvapením je Mukiele so 100-percentnou stabilitou, aj keď s nižším bodovým medianom.",
+        "duration": 5000,
+        "highlight": "Mukiele"
+    },
+    {
+        "at": 30,
+        "say": "Vráťme sa na všetkých hráčov a pozrime sa na stred poľa.",
+        "duration": 4000,
+        "click": "All"
+    },
+    {
+        "at": 35,
+        "say": "Enzo aj Bruno Guimaraes podávajú stabilné výkony a sú kľúčoví pre vaše transfery.",
+        "duration": 5000,
+        "highlight": "Enzo"
+    },
+    {
+        "at": 41,
+        "say": "Nezabúdajte sledovať stĺpec 'CONS.' – ten vám povie, kto vás v dôležitom momente nepodrazí.",
+        "duration": 6000,
+        "highlight": "CONS"
+    },
+    {
+        "at": 48,
+        "zoom": "Gabriel",
+        "scale": 1.5,
+        "duration": 2000
+    },
+    {
+        "at": 48,
+        "say": "Pozrite na túto formu Gabriela: 15, 9, 6, 8... Skutočný stroj na body.",
+        "duration": 5000
+    },
+    {
+        "at": 54,
+        "say": "Viac analýz nájdete na FPL Studio. Klikaj na link v BIO a ovládni svoju ligu!",
+        "duration": 5000,
+        "zoom": "Reset"
+    },
+    {
+        "at": 60,
+        "say": "Happy hunting!",
+        "duration": 2000
+    }
+]

@@ -22,6 +22,7 @@ async function run() {
     const context = await browser.newContext({
         ...device,
         viewport: config.viewport || device.viewport,
+        deviceScaleFactor: 2, // Keep it sharp
         recordVideo: {
             dir: videoDir,
             size: config.viewport || device.viewport
@@ -116,7 +117,7 @@ async function run() {
                 // Subtitles
                 const subs = document.createElement('div');
                 subs.id = 'director-subs';
-                subs.style.cssText = 'position:fixed;bottom:28%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.1);color:white;padding:12px 20px;border-radius:15px;font-family: "Outfit", system-ui, sans-serif;font-size:16px;font-weight:700;z-index:999999;display:none;text-align:center;width:75%;box-shadow:0 10px 40px rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);line-height:1.3;text-transform:uppercase;letter-spacing:0.5px;backdrop-filter:blur(10px);animation: subtitle-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);';
+                subs.style.cssText = 'position:fixed;bottom:10%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);color:white;padding:12px 20px;border-radius:18px;font-family: "Outfit", system-ui, sans-serif;font-size:18px;font-weight:700;z-index:999999;display:none;text-align:center;width:82%;box-shadow:0 15px 50px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.15);line-height:1.4;letter-spacing:0.3px;backdrop-filter:blur(20px);animation: subtitle-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);';
 
                 const style = document.createElement('style');
                 style.innerHTML = `
@@ -162,7 +163,10 @@ async function run() {
                 // Use absolute positioning relative to body so it scales with zoom
                 const absX = x + window.scrollX;
                 const absY = y + window.scrollY;
-                el.style.cssText = `position:absolute;left:${absX}px;top:${absY}px;width:${w}px;height:${h}px;border:5px solid #ff0055;border-radius:12px;box-shadow:0 0 25px rgba(255,0,85,0.6);z-index:999997;pointer-events:none;box-sizing:border-box;display:block !important;visible:visible;`;
+                // Add padding to make it wider/higher
+                const paddingX = 15;
+                const paddingY = 8;
+                el.style.cssText = `position:absolute;left:${absX - paddingX}px;top:${absY - paddingY}px;width:${w + paddingX * 2}px;height:${h + paddingY * 2}px;border:6px solid #ff0055;border-radius:16px;box-shadow:0 0 30px rgba(255,0,85,0.7);z-index:999997;pointer-events:none;box-sizing:border-box;display:block !important;visible:visible;`;
 
                 // Animation
                 el.animate([
@@ -363,10 +367,11 @@ async function run() {
                 c.style.display = 'block';
                 c.style.left = (x - 25) + 'px';
                 c.style.top = (y - 25) + 'px';
-                setTimeout(() => { c.style.transform = 'scale(0.8)'; }, 100);
-                setTimeout(() => { c.style.transform = 'scale(1)'; }, 200);
+                c.style.transform = 'scale(1.5)';
+                setTimeout(() => { c.style.transform = 'scale(1)'; }, 300);
             }, { x: targetX, y: targetY });
-            await page.mouse.move(targetX, targetY, { steps: 8 });
+            await page.mouse.move(targetX, targetY, { steps: 12 });
+            await page.waitForTimeout(1000); // Wait 1s before click/action while showing cursor
             return res;
         }
         return null;
@@ -381,12 +386,15 @@ async function run() {
         click: async (text) => {
             const res = await moveToElement(text);
             if (res) {
-                await res.locator.click({ delay: 100 });
-                await page.waitForTimeout(600);
                 await page.evaluate(() => {
                     const c = document.getElementById('director-cursor');
-                    if (c) c.style.display = 'none';
+                    if (c) {
+                        c.style.transform = 'scale(0.8)';
+                        setTimeout(() => { c.style.display = 'none'; }, 800);
+                    }
                 });
+                await res.locator.click({ delay: 100 }).catch(() => res.locator.click({ force: true }));
+                await page.waitForTimeout(800);
             } else {
                 console.log(`ℹ️ Skipping click on "${text}" (not found/visible)`);
             }
@@ -394,10 +402,25 @@ async function run() {
         highlight: async (text, d) => {
             const res = await findTarget(text);
             if (res) {
-                const { box } = res;
+                const { box, locator } = res;
+
+                // Calculate absolute Y coordinate
+                const scrollY = await page.evaluate(() => window.scrollY);
+                const absoluteY = box.y + scrollY;
+
+                // Target Y: place element at ~25% from the top of viewport to keep it visible above subtitles
+                const targetY = Math.max(0, absoluteY - 230);
+
+                // Natural smooth scroll
+                await page.evaluate(({ y }) => window.Director.animateScrollTo(0, y, 900), { y: targetY });
+                await page.waitForTimeout(1000);
+
+                // Re-fetch box after scroll
+                const finalBox = await locator.boundingBox() || box;
+
                 await page.evaluate(({ x, y, w, h, d }) => {
                     window.Director.showHighlight(x, y, w, h, d);
-                }, { x: box.x, y: box.y, w: box.width, h: box.height, d });
+                }, { x: finalBox.x, y: finalBox.y, w: finalBox.width, h: finalBox.height, d });
             }
         },
         say: async (text, d) => {
@@ -411,8 +434,6 @@ async function run() {
             const res = await findTarget(text);
             if (res) {
                 const { box } = res;
-                // SMART ZOOM: horizontal anchor at viewport center (390 / 2 = 195) 
-                // to prevent clipping the right side of the video on narrow 9:16 aspect ratio.
                 const viewportCenterX = 195;
                 const centerY = box.y + box.height / 2;
                 await page.evaluate(({ s, x, y, d }) => window.Director.zoom(s, x, y, d), { s: scale || 1.15, x: viewportCenterX, y: centerY, d: duration || 1000 });
@@ -514,27 +535,17 @@ async function run() {
         console.error("Setup failed (continuing to prompt):", e);
     }
 
-    try {
-        console.log('\n--- 🚦 AUTO-VOICE STUDIO ---');
-        console.log('1. V prehliadači skontroluj SETUP (zvolená sekcia).');
-        console.log('2. Daj ENTER pre "One-Click" produkciu (Nahrávanie).');
-        console.log('----------------------------\n');
+    console.log('\n--- 🚦 AUTO-VOICE STUDIO (Auto-Proceed) ---');
+    console.log('Automating start in 2 seconds...');
+    await new Promise(r => setTimeout(r, 2000));
 
-        process.stdin.resume();
-        // Drain any previous formatting enter keys
-        process.stdin.removeAllListeners('data');
-        await new Promise(resolve => process.stdin.once('data', resolve));
-        process.stdin.pause();
+    // Start Recording Markers
+    scriptStartTime = (Date.now() - recordingStart) / 1000;
+    startStamp = Date.now();
 
-        // Start Recording Markers
-        scriptStartTime = (Date.now() - recordingStart) / 1000;
-        startStamp = Date.now();
+    // Reset timer
+    await page.evaluate(() => { window._timerStart = Date.now(); });
 
-        // Reset timer on Enter
-        await page.evaluate(() => { window._timerStart = Date.now(); });
-    } catch (e) {
-        console.error("Prompt error:", e);
-    }
 
     // Play Master Audio Locally
     if (masterAudioPath && fs.existsSync(masterAudioPath)) {
@@ -595,10 +606,13 @@ async function run() {
             '-af', audioFilter,
             '-c:v', 'libx264',
             '-preset', 'slow',
-            '-crf', '18',
+            '-tune', 'stillimage', // Optimized for UI/text
+            '-crf', '12', // Even higher quality (lower is better)
+            '-profile:v', 'high',
+            '-level', '4.2',
             '-pix_fmt', 'yuv420p',
             '-c:a', 'aac',
-            '-b:a', '192k'
+            '-b:a', '320k'
         );
 
         if (audioExists) {
