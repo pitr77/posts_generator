@@ -5,123 +5,34 @@
         "navigate": "Transfer Picks"
     },
     {
-        "at": 1.0,
-        "say": "Hey there! We have some top transfer tips for the upcoming gameweek.",
-        "duration": 4000
+        "at": 0.5,
+        "say": "Friday FPL Update! Top Midfielder picks.",
+        "duration": 2500,
+        "click": "MID"
     },
     {
-        "at": 5.2,
-        "say": "Today, we're focusing on defenders and forwards.",
+        "at": 3.5,
+        "highlight": "Wirtz",
         "duration": 3500
     },
     {
-        "at": 10.0,
-        "say": "Let's start with the defense. Switching over to the defensive section now.",
-        "duration": 6000,
-        "click": "DEF"
+        "at": 3.7,
+        "say": "Wirtz is our #1 pick with elite 7.4 form.",
+        "duration": 3300
     },
     {
-        "at": 19.0,
-        "highlight": "Gabriel",
-        "duration": 7500
-    },
-    {
-        "at": 19.5,
-        "say": "Arsenal's Gabriel is the clear number one among defenders,",
-        "duration": 4000
-    },
-    {
-        "at": 23.5,
-        "say": "thanks to his high form and the Gunners' solid backline.",
-        "duration": 4500
-    },
-    {
-        "at": 31.0,
-        "highlight": "Timber",
-        "duration": 8000
-    },
-    {
-        "at": 31.5,
-        "say": "His teammate Jurrien Timber is a great alternative,",
-        "duration": 4000
-    },
-    {
-        "at": 35.5,
-        "say": "offering serious attacking threat at an excellent price point.",
-        "duration": 4500
-    },
-    {
-        "at": 42.0,
-        "say": "Now let's switch gears and look at the strikers.",
-        "duration": 4000,
-        "scroll": [
-            0,
-            1000
-        ]
-    },
-    {
-        "at": 46.2,
-        "say": "Heading over to the forwards section.",
-        "duration": 3000,
-        "click": "FWD"
-    },
-    {
-        "at": 51.5,
-        "scroll": [
-            250,
-            1000
-        ]
-    },
-    {
-        "at": 53.0,
-        "highlight": "João Pedro",
-        "duration": 8000
-    },
-    {
-        "at": 53.5,
-        "say": "Brighton's João Pedro is currently the most sought-after forward.",
-        "duration": 4000
-    },
-    {
-        "at": 57.5,
-        "say": "His value for money is simply unbeatable right now.",
-        "duration": 4500
-    },
-    {
-        "at": 64.5,
-        "scroll": [
-            480,
-            1000
-        ]
-    },
-    {
-        "at": 66.0,
-        "highlight": "Ekitiké",
-        "duration": 8000
-    },
-    {
-        "at": 66.5,
-        "say": "Our dark horse pick is Ekitiké. His expected goals data is very promising,",
-        "duration": 4500
-    },
-    {
-        "at": 71.0,
-        "say": "suggesting more points are coming soon.",
-        "duration": 4000
-    },
-    {
-        "at": 77.0,
-        "say": "We hope these picks help you dominate your mini-leagues.",
-        "duration": 4000
-    },
-    {
-        "at": 81.2,
-        "say": "Good luck and see you in the next one!",
+        "at": 7.5,
+        "highlight": "Cunha",
         "duration": 3500
     },
     {
-        "at": 86.0,
-        "say": "Happy point hunting and good luck!",
-        "duration": 4000
+        "at": 7.7,
+        "say": "Cunha and Bruno Fernandes are also essential.",
+        "duration": 3300
+    },
+    {
+        "at": 11.5,
+        "say": "Follow for more deadline tips! Good luck!",
+        "duration": 3000
     }
 ]

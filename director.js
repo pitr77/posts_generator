@@ -22,7 +22,7 @@ async function run() {
     const context = await browser.newContext({
         ...device,
         viewport: config.viewport || device.viewport,
-        deviceScaleFactor: 2, // Keep it sharp
+        deviceScaleFactor: 2, // Stable high quality
         recordVideo: {
             dir: videoDir,
             size: config.viewport || device.viewport
@@ -612,7 +612,8 @@ async function run() {
             '-level', '4.2',
             '-pix_fmt', 'yuv420p',
             '-c:a', 'aac',
-            '-b:a', '320k'
+            '-b:a', '320k',
+            '-ar', '48000'
         );
 
         if (audioExists) {
