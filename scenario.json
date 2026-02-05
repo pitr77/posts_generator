@@ -2,47 +2,35 @@
     {
         "at": 0,
         "setup": true,
-        "navigate": "Transfer Picks"
+        "navigate": "Fixtures"
     },
     {
         "at": 0.5,
-        "say": "Friday FPL Update! Top Midfielders.",
-        "duration": 2500,
-        "click": "MID"
+        "say": "Quick Fixture Update! Let's check who has the best and worst games this weekend.",
+        "duration": 4000
     },
     {
-        "at": 3.5,
-        "highlight": "Wirtz",
-        "duration": 3000
+        "at": 5.0,
+        "say": "Burnley and West Ham both have a green light. It's an EASY fixture for both sides!",
+        "duration": 5000,
+        "highlight": "Burnley"
     },
     {
-        "at": 3.7,
-        "say": "At number one, we have Wirtz.",
-        "duration": 2500
+        "at": 11.0,
+        "say": "Chelsea also looks good with an EASY game against Wolves. Might be time for a triple-up?",
+        "duration": 5000,
+        "highlight": "Chelsea"
     },
     {
-        "at": 6.5,
-        "highlight": "Cunha",
-        "duration": 3000
+        "at": 17.0,
+        "say": "But be careful! Liverpool and City face off in a double Very Hard clash.",
+        "duration": 5000,
+        "highlight": "Liverpool"
     },
     {
-        "at": 6.7,
-        "say": "Second spot goes to Cunha.",
-        "duration": 2500
-    },
-    {
-        "at": 9.5,
-        "highlight": "Fernandes",
-        "duration": 3000
-    },
-    {
-        "at": 9.7,
-        "say": "And third is Bruno Fernandes.",
-        "duration": 2500
-    },
-    {
-        "at": 13.0,
-        "say": "Good luck with your transfers!",
-        "duration": 2500
+        "at": 23.0,
+        "say": "It's going to be a tough deadline. Good luck with your transfers!",
+        "duration": 4000,
+        "zoom": "Reset"
     }
 ]

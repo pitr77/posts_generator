@@ -17,7 +17,7 @@ async function run() {
 
     const { devices } = require('playwright');
     const device = config.isMobile ? devices['iPhone 12'] : {};
-    const videoDir = path.join(__dirname, 'recordings');
+    const videoDir = path.resolve(__dirname, '..', 'recordings');
 
     const context = await browser.newContext({
         ...device,
@@ -243,7 +243,7 @@ async function run() {
     console.log(`⏱️ Zistená dĺžka scenára: ${maxTime.toFixed(1)}s (Exportujem ${dynamicDuration}s)`);
 
     let masterAudioPath = null;
-    const recordingsDir = path.resolve(__dirname, 'recordings');
+    const recordingsDir = path.resolve(__dirname, '..', 'recordings');
     if (!fs.existsSync(recordingsDir)) fs.mkdirSync(recordingsDir);
 
     if (collectedTracks.length > 0) {
@@ -438,8 +438,10 @@ async function run() {
                 const scrollY = await page.evaluate(() => window.scrollY);
                 const absoluteY = box.y + scrollY;
 
-                // Target Y: place element at ~25% from the top of viewport to keep it visible above subtitles
-                const targetY = Math.max(0, absoluteY - 230);
+                // Target Y: Place element at ~30% from the top of viewport (e.g. 300px on a 960px screen)
+                // This keeps it well above the subtitles at the bottom.
+                const viewportHeight = await page.evaluate(() => window.innerHeight);
+                const targetY = Math.max(0, absoluteY - (viewportHeight * 0.3));
 
                 // Natural smooth scroll
                 await page.evaluate(({ y }) => window.Director.animateScrollTo(0, y, 900), { y: targetY });
@@ -603,7 +605,7 @@ async function run() {
     await browser.close();
 
     // 8. Final Processing (9:16 CROP & SCALE)
-    const finalVideoPath = path.join(__dirname, 'recordings', `auto_produced_${Date.now()}.mp4`);
+    const finalVideoPath = path.resolve(__dirname, '..', 'recordings', `auto_produced_${Date.now()}.mp4`);
 
     console.log(`🎬 Finálny master (1080x1920 + Auto-Voice)...`);
     const ffmpeg = require('ffmpeg-static');

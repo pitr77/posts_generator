@@ -16,9 +16,9 @@ async function generateVoiceTracks(tracks, lang = 'en', config = {}) {
     const provider = config.tts_provider || 'edge'; // 'edge' or 'openai'
     const results = [];
 
-    if (provider === 'openai' && config.openai_api_key) {
+    if (provider === 'openai' && config.openai?.api_key && config.openai.api_key !== 'sk-...') {
         console.log(`🎙️ Generujem OpenAI TTS (Model: tts-1)...`);
-        const openai = new OpenAI({ apiKey: config.openai_api_key });
+        const openai = new OpenAI({ apiKey: config.openai.api_key });
 
         for (const track of tracks) {
             const fileName = `track_${track.id}.mp3`;
@@ -27,7 +27,7 @@ async function generateVoiceTracks(tracks, lang = 'en', config = {}) {
             try {
                 const mp3 = await openai.audio.speech.create({
                     model: "tts-1",
-                    voice: config.voice || (lang.startsWith('en') ? "nova" : "onyx"),
+                    voice: config.openai.voice || (lang.startsWith('en') ? "nova" : "onyx"),
                     input: track.text,
                 });
                 const buffer = Buffer.from(await mp3.arrayBuffer());
@@ -39,12 +39,12 @@ async function generateVoiceTracks(tracks, lang = 'en', config = {}) {
                 }
             } catch (e) {
                 console.error(`   ❌ Chyba pri OpenAI TTS "${track.text}":`, e.message);
-                // Fallback to Edge if OpenAI fails? Or just log error.
             }
         }
     } else {
         // Fallback to Microsoft Edge Neural TTS
-        const voice = config.voice || (lang.startsWith('en') ? 'en-US-AvaNeural' : 'sk-SK-LukasNeural');
+        const edgeConfig = config.edge || {};
+        const voice = edgeConfig.voice || (lang.startsWith('en') ? 'en-US-AvaNeural' : 'sk-SK-LukasNeural');
         console.log(`🎙️ Generujem Microsoft Neural TTS (Hlas: ${voice})...`);
 
         for (const track of tracks) {
