@@ -6,33 +6,43 @@
     },
     {
         "at": 0.5,
-        "say": "Friday FPL Update! Top Midfielder picks.",
+        "say": "Friday FPL Update! Top Midfielders.",
         "duration": 2500,
         "click": "MID"
     },
     {
         "at": 3.5,
         "highlight": "Wirtz",
-        "duration": 3500
+        "duration": 3000
     },
     {
         "at": 3.7,
-        "say": "Wirtz is our #1 pick with elite 7.4 form.",
-        "duration": 3300
+        "say": "At number one, we have Wirtz.",
+        "duration": 2500
     },
     {
-        "at": 7.5,
+        "at": 6.5,
         "highlight": "Cunha",
-        "duration": 3500
-    },
-    {
-        "at": 7.7,
-        "say": "Cunha and Bruno Fernandes are also essential.",
-        "duration": 3300
-    },
-    {
-        "at": 11.5,
-        "say": "Follow for more deadline tips! Good luck!",
         "duration": 3000
+    },
+    {
+        "at": 6.7,
+        "say": "Second spot goes to Cunha.",
+        "duration": 2500
+    },
+    {
+        "at": 9.5,
+        "highlight": "Fernandes",
+        "duration": 3000
+    },
+    {
+        "at": 9.7,
+        "say": "And third is Bruno Fernandes.",
+        "duration": 2500
+    },
+    {
+        "at": 13.0,
+        "say": "Good luck with your transfers!",
+        "duration": 2500
     }
 ]

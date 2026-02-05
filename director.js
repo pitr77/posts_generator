@@ -240,25 +240,44 @@ async function run() {
 
     if (collectedTracks.length > 0) {
         const { generateVoiceTracks } = require('./voice_engine.js');
-        const generated = await generateVoiceTracks(collectedTracks, config.lang || 'en');
+        const generated = await generateVoiceTracks(collectedTracks, config.lang || 'en', config);
 
         console.log('🎹 Skladám master audio stopu...');
         const ffmpeg = require('ffmpeg-static');
         const { spawnSync } = require('child_process');
         masterAudioPath = path.resolve(recordingsDir, `master_${Date.now()}.mp3`);
 
-        // Use all=1 for adelay to ensure all channels are delayed
-        const filterStr = generated.map((t, i) => `[${i + 1}:a]adelay=${Math.round(t.time * 1000)}:all=1[a${i}]`).join(';');
-        // amix=inputs=N will divide volume by N. We compensate later or inside here.
-        // dropout_transition=0 prevents volume changes when tracks end.
-        const mixStr = `[0:a]` + generated.map((_, i) => `[a${i}]`).join('') + `amix=inputs=${generated.length + 1}:duration=longest:dropout_transition=0[out]`;
+        const musicFile = config.background_music && fs.existsSync(path.resolve(__dirname, config.background_music))
+            ? path.resolve(__dirname, config.background_music)
+            : null;
+
+        // Base silence source
+        const inputs = ['-f', 'lavfi', '-i', 'anullsrc=r=44100:cl=stereo'];
+        generated.forEach(t => inputs.push('-i', path.resolve(t.filePath)));
+
+        // Voice delay filters
+        const voiceFilters = generated.map((t, i) => `[${i + 1}:a]adelay=${Math.round(t.time * 1000)}:all=1[a${i}]`).join(';');
+
+        // Mix voices first
+        const voiceMixStr = generated.map((_, i) => `[a${i}]`).join('') + `amix=inputs=${generated.length}:duration=longest:dropout_transition=0[v_mixed]`;
+
+        let filterStr = `${voiceFilters};${voiceMixStr}`;
+        let finalOutputTag = '[v_mixed]';
+
+        // Add music if available
+        if (musicFile) {
+            inputs.push('-stream_loop', '-1', '-i', musicFile);
+            const musicIdx = generated.length + 1;
+            const musicVol = config.music_volume || 0.1;
+            filterStr += `;[${musicIdx}:a]volume=${musicVol}[bg_music];[v_mixed][bg_music]amix=inputs=2:duration=first:dropout_transition=0[out]`;
+            finalOutputTag = '[out]';
+        }
 
         const ffmpegArgs = [
             '-y',
-            '-f', 'lavfi', '-i', 'anullsrc=r=44100:cl=stereo', // Base silence
-            ...generated.flatMap(t => ['-i', path.resolve(t.filePath)]),
-            '-filter_complex', `${filterStr};${mixStr}`,
-            '-map', '[out]',
+            ...inputs,
+            '-filter_complex', filterStr,
+            '-map', finalOutputTag,
             '-t', (dynamicDuration + 5).toString(),
             masterAudioPath
         ];
@@ -606,8 +625,8 @@ async function run() {
             '-af', audioFilter,
             '-c:v', 'libx264',
             '-preset', 'slow',
-            '-tune', 'stillimage', // Optimized for UI/text
-            '-crf', '12', // Even higher quality (lower is better)
+            '-tune', 'stillimage',
+            '-crf', '10', // Near-lossless quality
             '-profile:v', 'high',
             '-level', '4.2',
             '-pix_fmt', 'yuv420p',
