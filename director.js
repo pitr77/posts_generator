@@ -400,7 +400,6 @@ async function run() {
             }, { x: targetX, y: targetY });
             await page.waitForTimeout(50);
             return res;
-            return res;
         }
         return null;
     };
