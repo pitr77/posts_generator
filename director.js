@@ -158,8 +158,16 @@ async function run() {
                 }
             };
 
+            window.Director.clearHighlights = () => {
+                const existing = document.querySelectorAll('.director-highlight-box');
+                existing.forEach(el => el.remove());
+            };
+
             window.Director.showHighlight = (x, y, w, h, duration = 2000) => {
+                window.Director.clearHighlights();
+
                 const el = document.createElement('div');
+                el.className = 'director-highlight-box';
                 // Use absolute positioning relative to body so it scales with zoom
                 const absX = x + window.scrollX;
                 const absY = y + window.scrollY;
@@ -390,7 +398,7 @@ async function run() {
                 setTimeout(() => { c.style.transform = 'scale(1)'; }, 300);
             }, { x: targetX, y: targetY });
             await page.mouse.move(targetX, targetY, { steps: 12 });
-            await page.waitForTimeout(1000); // Wait 1s before click/action while showing cursor
+            await page.waitForTimeout(100); // Wait 100ms before click/action while showing cursor
             return res;
         }
         return null;
@@ -419,6 +427,7 @@ async function run() {
             }
         },
         highlight: async (text, d) => {
+            await page.evaluate(() => window.Director.clearHighlights());
             const res = await findTarget(text);
             if (res) {
                 const { box, locator } = res;
@@ -443,6 +452,7 @@ async function run() {
             }
         },
         say: async (text, d) => {
+            await page.evaluate(() => window.Director.clearHighlights());
             await page.evaluate(({ text, d }) => { window.showSubtitle(text, d); }, { text, d });
         },
         zoom: async (text, scale, duration) => {

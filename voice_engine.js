@@ -27,7 +27,7 @@ async function generateVoiceTracks(tracks, lang = 'en', config = {}) {
             try {
                 const mp3 = await openai.audio.speech.create({
                     model: "tts-1",
-                    voice: lang.startsWith('en') ? "nova" : "onyx", // nova is good for en, onyx/alloy for others
+                    voice: config.voice || (lang.startsWith('en') ? "nova" : "onyx"),
                     input: track.text,
                 });
                 const buffer = Buffer.from(await mp3.arrayBuffer());
@@ -44,7 +44,7 @@ async function generateVoiceTracks(tracks, lang = 'en', config = {}) {
         }
     } else {
         // Fallback to Microsoft Edge Neural TTS
-        const voice = lang.startsWith('en') ? 'en-US-AvaNeural' : 'sk-SK-LukasNeural';
+        const voice = config.voice || (lang.startsWith('en') ? 'en-US-AvaNeural' : 'sk-SK-LukasNeural');
         console.log(`🎙️ Generujem Microsoft Neural TTS (Hlas: ${voice})...`);
 
         for (const track of tracks) {
