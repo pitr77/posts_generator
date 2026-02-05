@@ -388,17 +388,18 @@ async function run() {
             const { box } = res;
             const targetX = box.x + box.width / 2;
             const targetY = box.y + box.height / 2;
+            await page.mouse.move(targetX, targetY, { steps: 8 }); // Snappier move
             await page.evaluate(({ x, y }) => {
                 const c = document.getElementById('director-cursor');
                 if (!c) return;
-                c.style.display = 'block';
                 c.style.left = (x - 25) + 'px';
                 c.style.top = (y - 25) + 'px';
-                c.style.transform = 'scale(1.5)';
-                setTimeout(() => { c.style.transform = 'scale(1)'; }, 300);
+                c.style.display = 'block';
+                c.style.transform = 'scale(1.2)';
+                setTimeout(() => { c.style.transform = 'scale(1)'; }, 150);
             }, { x: targetX, y: targetY });
-            await page.mouse.move(targetX, targetY, { steps: 12 });
-            await page.waitForTimeout(100); // Wait 100ms before click/action while showing cursor
+            await page.waitForTimeout(50);
+            return res;
             return res;
         }
         return null;
@@ -413,15 +414,17 @@ async function run() {
         click: async (text) => {
             const res = await moveToElement(text);
             if (res) {
+                // Immediate visual click
                 await page.evaluate(() => {
                     const c = document.getElementById('director-cursor');
                     if (c) {
                         c.style.transform = 'scale(0.8)';
-                        setTimeout(() => { c.style.display = 'none'; }, 800);
+                        setTimeout(() => { c.style.display = 'none'; }, 400);
                     }
                 });
-                await res.locator.click({ delay: 100 }).catch(() => res.locator.click({ force: true }));
-                await page.waitForTimeout(800);
+                // Actual click
+                await res.locator.click({ delay: 50 }).catch(() => res.locator.click({ force: true }));
+                await page.waitForTimeout(300);
             } else {
                 console.log(`ℹ️ Skipping click on "${text}" (not found/visible)`);
             }
@@ -452,7 +455,6 @@ async function run() {
             }
         },
         say: async (text, d) => {
-            await page.evaluate(() => window.Director.clearHighlights());
             await page.evaluate(({ text, d }) => { window.showSubtitle(text, d); }, { text, d });
         },
         zoom: async (text, scale, duration) => {
